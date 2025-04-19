@@ -3,24 +3,23 @@ package com.tenyon.lb.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.tenyon.lb.common.constant.RedisConstant;
 import com.tenyon.lb.common.constant.UserConstant;
 import com.tenyon.lb.domain.entity.Blog;
-import com.tenyon.lb.domain.entity.Thumb;
 import com.tenyon.lb.domain.entity.User;
 import com.tenyon.lb.domain.vo.blog.BlogVO;
 import com.tenyon.lb.mapper.BlogMapper;
 import com.tenyon.lb.service.BlogService;
 import com.tenyon.lb.service.ThumbService;
 import jakarta.annotation.Resource;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +35,9 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Lazy
     private ThumbService thumbService;
 
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+
     @Override
     public BlogVO getBlogVOById(long blogId) {
         Blog blog = this.getById(blogId);
@@ -50,27 +52,24 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             return blogVO;
         }
         User user = (User) StpUtil.getSession().get(UserConstant.USER_LOGIN_STATE);
-        Thumb thumb = thumbService.lambdaQuery()
-                .eq(Thumb::getUserId, user.getId())
-                .eq(Thumb::getBlogId, blog.getId())
-                .one();
-        blogVO.setHasThumb(thumb != null);
+        Boolean exist = thumbService.hasThumb(blog.getId(), user.getId());
+        blogVO.setHasThumb(exist);
         return blogVO;
     }
 
     @Override
     public List<BlogVO> getBlogVOList(List<Blog> blogList) {
+        List<Object> blogIds = blogList.stream().map(blog -> blog.getId().toString()).collect(Collectors.toList());
         Map<Long, Boolean> blogIdHasThumbMap = new HashMap<>();
         if (StpUtil.isLogin()) {
             User user = (User) StpUtil.getSession().get(UserConstant.USER_LOGIN_STATE);
-            Set<Long> blogIdSet = blogList.stream().map(Blog::getId).collect(Collectors.toSet());
-            // 获取点赞
-            List<Thumb> thumbList = thumbService.lambdaQuery()
-                    .eq(Thumb::getUserId, user.getId())
-                    .in(Thumb::getBlogId, blogIdSet)
-                    .list();
-
-            thumbList.forEach(blogThumb -> blogIdHasThumbMap.put(blogThumb.getBlogId(), true));
+            List<Object> thumbList =
+                    redisTemplate.opsForHash().multiGet(RedisConstant.USER_THUMB_KEY_PREFIX + user.getId().toString(), blogIds);
+            for (int i = 0; i < thumbList.size(); i++) {
+                if (thumbList.get(i) != null) {
+                    blogIdHasThumbMap.put(Long.valueOf(blogIds.get(i).toString()), true);
+                }
+            }
         }
 
         return blogList.stream()
