@@ -89,7 +89,7 @@ public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements
         // 加锁
         synchronized (loginUser.getId().toString().intern()) {
 
-            // 编程式事务 key=thumb:userid field=blogid
+            // 编程式事务 key={thumb:userid} field={blogid} value={hotThumb}
             return transactionTemplate.execute(status -> {
                 Long blogId = doThumbDTO.getBlogId();
                 HotThumb hotThumb = (HotThumb) redisTemplate.opsForHash().get(RedisConstant.USER_THUMB_KEY_PREFIX + loginUser.getId().toString(),
