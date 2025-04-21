@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.tenyon.lb.mapper.ThumbMapper">
+<mapper namespace="com.tenyon.web.mapper.ThumbMapper">
 
-    <resultMap id="BaseResultMap" type="com.tenyon.lb.domain.entity.Thumb">
+    <resultMap id="BaseResultMap" type="com.tenyon.web.domain.entity.Thumb">
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="userId" column="userId" jdbcType="BIGINT"/>
         <result property="blogId" column="blogId" jdbcType="BIGINT"/>
