@@ -3,10 +3,10 @@ package com.tenyon.lb.service.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.tenyon.lb.common.constant.RedisConstant;
 import com.tenyon.lb.common.exception.BusinessException;
 import com.tenyon.lb.common.exception.ErrorCode;
 import com.tenyon.lb.common.exception.ThrowUtils;
+import com.tenyon.lb.common.utils.RedisUtils;
 import com.tenyon.lb.domain.dto.thumb.DoThumbDTO;
 import com.tenyon.lb.domain.dto.thumb.HotThumb;
 import com.tenyon.lb.domain.entity.Blog;
@@ -32,7 +32,7 @@ import java.time.ZoneOffset;
  */
 @Slf4j
 @RequiredArgsConstructor
-@Service
+@Service("thumbServiceDB")
 public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements ThumbService {
 
     private final UserService userService;
@@ -73,7 +73,7 @@ public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements
                     hotThumb.setThumbId(thumb.getId());
                     // 30天热点点赞数据缓存
                     hotThumb.setExpireTime(LocalDateTimeUtil.now().plusDays(30).toInstant(ZoneOffset.ofHours(8)).toEpochMilli());
-                    redisTemplate.opsForHash().put(RedisConstant.USER_THUMB_KEY_PREFIX + loginUser.getId().toString(), blogId.toString(), hotThumb);
+                    redisTemplate.opsForHash().put(RedisUtils.getUserThumbKey(loginUser.getId()), blogId.toString(), hotThumb);
                 }
                 return true;
             });
@@ -92,8 +92,7 @@ public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements
             // 编程式事务 key={thumb:userid} field={blogid} value={hotThumb}
             return transactionTemplate.execute(status -> {
                 Long blogId = doThumbDTO.getBlogId();
-                HotThumb hotThumb = (HotThumb) redisTemplate.opsForHash().get(RedisConstant.USER_THUMB_KEY_PREFIX + loginUser.getId().toString(),
-                                blogId.toString());
+                HotThumb hotThumb = (HotThumb) redisTemplate.opsForHash().get(RedisUtils.getUserThumbKey(loginUser.getId()), blogId.toString());
                 // redis中无点赞数据，或者已经过期就要去查询 mysql
                 if (hotThumb == null || hotThumb.getExpireTime() < DateUtil.current()) {
                     Thumb thumb = this.lambdaQuery().eq(Thumb::getUserId, loginUser.getId()).eq(Thumb::getBlogId, blogId).one();
@@ -108,8 +107,7 @@ public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements
 
                 boolean success = update && this.removeById(hotThumb.getThumbId());
                 if (success) {
-                    redisTemplate.opsForHash().delete(RedisConstant.USER_THUMB_KEY_PREFIX + loginUser.getId().toString(),
-                            blogId.toString());
+                    redisTemplate.opsForHash().delete(RedisUtils.getUserThumbKey(loginUser.getId()), blogId.toString());
                 }
                 return success;
             });
@@ -118,8 +116,7 @@ public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements
 
     @Override
     public Boolean hasThumb(Long blogId, Long userId) {
-        HotThumb hotThumb = (HotThumb) redisTemplate.opsForHash().get(RedisConstant.USER_THUMB_KEY_PREFIX + userId.toString(),
-                blogId.toString());
+        HotThumb hotThumb = (HotThumb) redisTemplate.opsForHash().get(RedisUtils.getUserThumbKey(userId), blogId.toString());
         // 查看 redis中的点赞缓存数据
         if (hotThumb == null) {
             //查看 mysql中的点赞数据
@@ -128,7 +125,7 @@ public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements
         }
         if (hotThumb.getExpireTime() < DateUtil.current()) {
             // 点赞数据过期
-            redisTemplate.opsForHash().delete(RedisConstant.USER_THUMB_KEY_PREFIX + userId, blogId.toString());
+            redisTemplate.opsForHash().delete(RedisUtils.getUserThumbKey(userId), blogId.toString());
             return false;
 
         }

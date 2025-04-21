@@ -29,4 +29,5 @@
             #{id}
         </foreach>
     </update>
+
 </mapper>

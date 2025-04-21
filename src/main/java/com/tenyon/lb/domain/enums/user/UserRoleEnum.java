@@ -1,6 +1,7 @@
 package com.tenyon.lb.domain.enums.user;
 
 import cn.hutool.core.util.StrUtil;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 /**
  * 用户角色枚举
  */
+@Getter
 public enum UserRoleEnum {
 
     USER("用户", "user"),
@@ -53,11 +55,4 @@ public enum UserRoleEnum {
         return null;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public String getText() {
-        return text;
-    }
 }
