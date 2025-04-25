@@ -1,4 +1,4 @@
-package com.tenyon.web.core.auth;
+package com.tenyon.web.manager.auth;
 
 import cn.dev33.satoken.stp.StpInterface;
 import org.springframework.stereotype.Component;

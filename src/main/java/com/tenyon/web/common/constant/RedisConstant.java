@@ -21,6 +21,11 @@ public interface RedisConstant {
      */
     String TEMP_THUMB_KEY_PREFIX = "thumb:temp:%s";
 
+    /**
+     * 当前未点赞
+     */
+    Long UN_THUMB_CONSTANT = 0L;
+
 
     /**
      * 点赞 Lua 脚本

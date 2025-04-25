@@ -29,7 +29,7 @@ import java.util.Arrays;
  */
 @Slf4j
 @RequiredArgsConstructor
-@Service("thumbService")
+@Service("thumbServiceRedis")
 public class ThumbServiceRedisImpl extends ServiceImpl<ThumbMapper, Thumb> implements ThumbService {
 
     private final UserService userService;
