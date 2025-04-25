@@ -45,7 +45,13 @@ public class SyncThumb2DBJob {
     public void run() {
         log.info("开始执行");
         DateTime nowDate = DateUtil.date();
-        String date = DateUtil.format(nowDate, "HH:mm:") + (DateUtil.second(nowDate) / 10 - 1) * 10;
+        // 同步上一分钟 50-59s数据
+        int second = (DateUtil.second(nowDate) / 10 - 1) * 10;
+        if (second == -10) {
+            second = 50;
+            nowDate = DateUtil.offsetMinute(nowDate, -1);
+        }
+        String date = DateUtil.format(nowDate, "HH:mm:") + second;
         syncThumb2DBByDate(date);
         log.info("临时数据同步完成");
     }
