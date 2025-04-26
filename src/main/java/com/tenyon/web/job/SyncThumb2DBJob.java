@@ -28,7 +28,7 @@ import java.util.Map;
  * @date 2025/4/22
  */
 @Slf4j
-@Component
+//@Component
 public class SyncThumb2DBJob {
 
     @Resource

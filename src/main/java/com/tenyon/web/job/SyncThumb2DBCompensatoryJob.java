@@ -20,7 +20,7 @@ import java.util.Set;
  * @date 2025/4/22
  */
 @Slf4j
-@Component
+//@Component
 public class SyncThumb2DBCompensatoryJob {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
