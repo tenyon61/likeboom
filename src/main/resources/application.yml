@@ -54,6 +54,9 @@ spring:
           max-idle: 5
           min-idle: 0
           max-active: 20
+  pulsar:
+    client:
+      service-url: pulsar://${pulsar.host}:6650
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false

@@ -1,15 +1,11 @@
 package com.tenyon.web.service.impl;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.tenyon.web.common.constant.RedisConstant;
 import com.tenyon.web.common.exception.BusinessException;
 import com.tenyon.web.common.exception.ErrorCode;
-import com.tenyon.web.common.exception.ThrowUtils;
 import com.tenyon.web.common.utils.RedisUtils;
 import com.tenyon.web.domain.dto.thumb.DoThumbDTO;
-import com.tenyon.web.domain.dto.thumb.HotThumb;
 import com.tenyon.web.domain.entity.Blog;
 import com.tenyon.web.domain.entity.Thumb;
 import com.tenyon.web.domain.entity.User;
@@ -24,8 +20,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.time.ZoneOffset;
-
 /**
  * 点赞服务
  *
@@ -34,7 +28,7 @@ import java.time.ZoneOffset;
  */
 @Slf4j
 @RequiredArgsConstructor
-@Service("thumbService")
+@Service("thumbServiceLocalCache")
 public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements ThumbService {
 
     private final UserService userService;

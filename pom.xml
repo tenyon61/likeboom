@@ -118,6 +118,10 @@
             <artifactId>minio</artifactId>
             <version>${minio.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-pulsar</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
