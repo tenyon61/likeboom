@@ -94,7 +94,7 @@ public class ThumbConsumer {
                                     if (list.size() % 2 == 0) {
                                         return null;
                                     }
-                                    return list.get(list.size() - 1);
+                                    return list.getLast();
                                 }
                         )
                 ));
