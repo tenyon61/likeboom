@@ -29,7 +29,7 @@ spring:
     timeout: 2592000
   # 数据库配置
   datasource:
-    url: jdbc:mysql://${datasource.mysql.host}:3306/likeboom?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&autoReconnect=false&useSSL=false
+    url: jdbc:mysql://${datasource.mysql.host}:4000/likeboom
     username: ${datasource.mysql.username}
     password: ${datasource.mysql.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
