@@ -1,8 +1,11 @@
 package com.tenyon.web.controller;
 
 import com.tenyon.web.common.domain.vo.resp.RtnData;
+import com.tenyon.web.common.exception.ErrorCode;
 import com.tenyon.web.domain.dto.thumb.DoThumbDTO;
 import com.tenyon.web.service.ThumbService;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -22,14 +25,38 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/thumb")
 public class ThumbController {
 
+    private final Counter successCounter;
+    private final Counter failureCounter;
+
+    public ThumbController(MeterRegistry registry) {
+        this.successCounter = Counter.builder("thumb.success.count")
+                .description("Total sucessful thumb")
+                .register(registry);
+
+        this.failureCounter = Counter.builder("thumb.failure.count")
+                .description("Total failed thumb")
+                .register(registry);
+    }
+
     @Resource
     private ThumbService thumbService;
 
     @Operation(summary = "点赞")
     @PostMapping("/do")
     public RtnData<Boolean> doThumb(@RequestBody DoThumbDTO doThumbDTO) {
-        Boolean success = thumbService.doThumb(doThumbDTO);
-        return RtnData.success(success);
+        try {
+            Boolean success = thumbService.doThumb(doThumbDTO);
+            if (success) {
+                successCounter.increment();
+                return RtnData.success(true);
+            } else {
+                failureCounter.increment();
+                return RtnData.fail(ErrorCode.SYSTEM_ERROR);
+            }
+        } catch (Exception e) {
+            failureCounter.increment();
+            return RtnData.fail(ErrorCode.SYSTEM_ERROR);
+        }
     }
 
     @Operation(summary = "取消点赞")
