@@ -6,6 +6,7 @@ import com.tenyon.web.service.ThumbService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,15 +28,15 @@ public class ThumbController {
 
     @Operation(summary = "点赞")
     @PostMapping("/do")
-    public RtnData<Boolean> doThumb(@RequestBody DoThumbDTO doThumbDTO) {
-        Boolean success = thumbService.doThumb(doThumbDTO);
+    public RtnData<Boolean> doThumb(@RequestBody DoThumbDTO doThumbDTO, HttpServletRequest request) {
+        Boolean success = thumbService.doThumb(doThumbDTO,request);
         return RtnData.success(success);
     }
 
     @Operation(summary = "取消点赞")
     @PostMapping("/undo")
-    public RtnData<Boolean> undoThumb(@RequestBody DoThumbDTO doThumbDTO) {
-        Boolean success = thumbService.undoThumb(doThumbDTO);
+    public RtnData<Boolean> undoThumb(@RequestBody DoThumbDTO doThumbDTO,HttpServletRequest request) {
+        Boolean success = thumbService.undoThumb(doThumbDTO,request);
         return RtnData.success(success);
     }
 }

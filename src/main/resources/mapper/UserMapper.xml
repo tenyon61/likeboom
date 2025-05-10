@@ -6,33 +6,10 @@
 
     <resultMap id="BaseResultMap" type="com.tenyon.web.domain.entity.User">
         <id property="id" column="id"/>
-        <result property="account" column="account"/>
-        <result property="password" column="password"/>
-        <result property="unionId" column="unionId"/>
-        <result property="mpOpenId" column="mpOpenId"/>
         <result property="name" column="name"/>
-        <result property="avatar" column="avatar"/>
-        <result property="profile" column="profile"/>
-        <result property="sex" column="sex"/>
-        <result property="email" column="email"/>
-        <result property="phone" column="phone"/>
-        <result property="userRole" column="userRole"/>
-        <result property="vipNumber" column="vipNumber"/>
-        <result property="vipCode" column="vipCode"/>
-        <result property="vipExpireTime" column="vipExpireTime"/>
-        <result property="shareCode" column="shareCode"/>
-        <result property="inviteUser" column="inviteUser"/>
-        <result property="editTime" column="editTime"/>
-        <result property="createTime" column="createTime"/>
-        <result property="updateTime" column="updateTime"/>
-        <result property="isDelete" column="isDelete"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id
-        ,account,password,unionId,mpOpenId,name,
-        avatar,profile,sex,email,phone,
-        userRole,vipNumber,vipCode,vipExpireTime,shareCode,
-        inviteUser,editTime,createTime,updateTime,isDelete
+        id,name
     </sql>
 </mapper>

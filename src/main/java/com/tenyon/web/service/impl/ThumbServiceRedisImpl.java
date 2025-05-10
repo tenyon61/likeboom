@@ -14,6 +14,7 @@ import com.tenyon.web.domain.enums.LuaStatusEnum;
 import com.tenyon.web.mapper.ThumbMapper;
 import com.tenyon.web.service.ThumbService;
 import com.tenyon.web.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -29,7 +30,7 @@ import java.util.Arrays;
  */
 @Slf4j
 @RequiredArgsConstructor
-@Service("thumbServiceRedis")
+@Service("thumbService")
 public class ThumbServiceRedisImpl extends ServiceImpl<ThumbMapper, Thumb> implements ThumbService {
 
     private final UserService userService;
@@ -37,11 +38,11 @@ public class ThumbServiceRedisImpl extends ServiceImpl<ThumbMapper, Thumb> imple
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
-    public Boolean doThumb(DoThumbDTO doThumbDTO) {
+    public Boolean doThumb(DoThumbDTO doThumbDTO, HttpServletRequest request) {
         if (doThumbDTO == null || doThumbDTO.getBlogId() == null) {
             throw new RuntimeException("参数错误");
         }
-        User loginUser = userService.getLoginUser();
+        User loginUser = userService.getLoginUser(request);
         Long blogId = doThumbDTO.getBlogId();
 
         String timeSlice = getTimeSlice();
@@ -57,18 +58,18 @@ public class ThumbServiceRedisImpl extends ServiceImpl<ThumbMapper, Thumb> imple
                 blogId
         );
 
-        ThrowUtils.throwIf(LuaStatusEnum.FAIL.getValue() == result, ErrorCode.OPERATION_ERROR,"用户已点赞");
+        ThrowUtils.throwIf(LuaStatusEnum.FAIL.getValue() == result, ErrorCode.OPERATION_ERROR, "用户已点赞");
 
         // 更新成功才执行
         return LuaStatusEnum.SUCCESS.getValue() == result;
     }
 
     @Override
-    public Boolean undoThumb(DoThumbDTO doThumbDTO) {
+    public Boolean undoThumb(DoThumbDTO doThumbDTO, HttpServletRequest request) {
         if (doThumbDTO == null || doThumbDTO.getBlogId() == null) {
             throw new RuntimeException("参数错误");
         }
-        User loginUser = userService.getLoginUser();
+        User loginUser = userService.getLoginUser(request);
 
         Long blogId = doThumbDTO.getBlogId();
         // 计算时间片  
@@ -85,7 +86,7 @@ public class ThumbServiceRedisImpl extends ServiceImpl<ThumbMapper, Thumb> imple
                 blogId
         );
         // 根据返回值处理结果
-        ThrowUtils.throwIf(result == LuaStatusEnum.FAIL.getValue(), ErrorCode.OPERATION_ERROR,"用户未点赞");
+        ThrowUtils.throwIf(result == LuaStatusEnum.FAIL.getValue(), ErrorCode.OPERATION_ERROR, "用户未点赞");
         return LuaStatusEnum.SUCCESS.getValue() == result;
     }
 

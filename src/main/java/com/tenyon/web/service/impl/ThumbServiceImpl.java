@@ -1,15 +1,11 @@
 package com.tenyon.web.service.impl;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.tenyon.web.common.constant.RedisConstant;
 import com.tenyon.web.common.exception.BusinessException;
 import com.tenyon.web.common.exception.ErrorCode;
-import com.tenyon.web.common.exception.ThrowUtils;
 import com.tenyon.web.common.utils.RedisUtils;
 import com.tenyon.web.domain.dto.thumb.DoThumbDTO;
-import com.tenyon.web.domain.dto.thumb.HotThumb;
 import com.tenyon.web.domain.entity.Blog;
 import com.tenyon.web.domain.entity.Thumb;
 import com.tenyon.web.domain.entity.User;
@@ -18,13 +14,12 @@ import com.tenyon.web.mapper.ThumbMapper;
 import com.tenyon.web.service.BlogService;
 import com.tenyon.web.service.ThumbService;
 import com.tenyon.web.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import java.time.ZoneOffset;
 
 /**
  * 点赞服务
@@ -34,7 +29,7 @@ import java.time.ZoneOffset;
  */
 @Slf4j
 @RequiredArgsConstructor
-@Service("thumbService")
+@Service("thumbServiceDB")
 public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements ThumbService {
 
     private final UserService userService;
@@ -48,11 +43,11 @@ public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
-    public Boolean doThumb(DoThumbDTO doThumbDTO) {
+    public Boolean doThumb(DoThumbDTO doThumbDTO, HttpServletRequest request) {
         if (doThumbDTO == null || doThumbDTO.getBlogId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        User loginUser = userService.getLoginUser();
+        User loginUser = userService.getLoginUser(request);
         // 加锁
         synchronized (loginUser.getId().toString().intern()) {
             // 编程式事务
@@ -85,11 +80,11 @@ public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements
     }
 
     @Override
-    public Boolean undoThumb(DoThumbDTO doThumbDTO) {
+    public Boolean undoThumb(DoThumbDTO doThumbDTO, HttpServletRequest request) {
         if (doThumbDTO == null || doThumbDTO.getBlogId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        User loginUser = userService.getLoginUser();
+        User loginUser = userService.getLoginUser(request);
         // 加锁
         synchronized (loginUser.getId().toString().intern()) {
 

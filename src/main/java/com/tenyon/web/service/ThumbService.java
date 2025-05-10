@@ -3,6 +3,7 @@ package com.tenyon.web.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.tenyon.web.domain.dto.thumb.DoThumbDTO;
 import com.tenyon.web.domain.entity.Thumb;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 点赞服务
@@ -18,7 +19,7 @@ public interface ThumbService extends IService<Thumb> {
      * @param doThumbDTO 点赞请求
      * @return Boolean
      */
-    Boolean doThumb(DoThumbDTO doThumbDTO);
+    Boolean doThumb(DoThumbDTO doThumbDTO, HttpServletRequest request);
 
     /**
      * 取消点赞
@@ -26,7 +27,7 @@ public interface ThumbService extends IService<Thumb> {
      * @param doThumbDTO 点赞请求
      * @return Boolean
      */
-    Boolean undoThumb(DoThumbDTO doThumbDTO);
+    Boolean undoThumb(DoThumbDTO doThumbDTO, HttpServletRequest request);
 
     /**
      * 是否点赞

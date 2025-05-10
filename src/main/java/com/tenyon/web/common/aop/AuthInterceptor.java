@@ -8,6 +8,7 @@ import com.tenyon.web.domain.entity.User;
 import com.tenyon.web.domain.enums.user.UserRoleEnum;
 import com.tenyon.web.service.UserService;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -35,14 +36,13 @@ public class AuthInterceptor {
     public Object doInterceptor(ProceedingJoinPoint joinPoint, AuthCheck authCheck) throws Throwable {
         String mustRole = authCheck.mustRole();
         // 当前登录用户
-        User loginUser = userService.getLoginUser();
         // 必须有该权限才通过
         if (StrUtil.isNotBlank(mustRole)) {
             UserRoleEnum mustUserRoleEnum = UserRoleEnum.of(mustRole);
             if (mustUserRoleEnum == null) {
                 throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
             }
-            String userRole = loginUser.getUserRole();
+            String userRole = null;
             // 如果被封号，直接拒绝
             if (UserRoleEnum.BAN.equals(mustUserRoleEnum)) {
                 throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
