@@ -46,32 +46,37 @@ class MainApplicationTest {
         List<User> list = userService.list();
 
         try (PrintWriter writer = new PrintWriter(new FileWriter("session_output.csv", true))) {
-            // 如果文件是第一次写入，可以加一个逻辑写表头
             writer.println("userId,sessionId,timestamp");
 
-            for (User user : list) {
-                long testUserId = user.getId();
+            // 使用并行流处理用户登录
+            list.parallelStream().forEach(user -> {
+                try {
+                    long testUserId = user.getId();
+                    MvcResult result = mockMvc.perform(get("/api/auth/login")
+                                    .param("userId", String.valueOf(testUserId))
+                                    .contentType(MediaType.APPLICATION_JSON))
+                            .andReturn();
+                    List<String> setCookieHeaders = result.getResponse().getHeaders("Set-Cookie");
+                    assertThat(setCookieHeaders).isNotEmpty();
 
-                MvcResult result = mockMvc.perform(get("/api/auth/login")
-                                .param("userId", String.valueOf(testUserId))
-                                .contentType(MediaType.APPLICATION_JSON))
-                        .andReturn();
+                    String sessionId = setCookieHeaders.stream()
+                            .filter(cookie -> cookie.startsWith("SESSION"))
+                            .map(cookie -> cookie.split(";")[0])
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException("No SESSION found in response"));
 
-                List<String> setCookieHeaders = result.getResponse().getHeaders("Set-Cookie");
-                assertThat(setCookieHeaders).isNotEmpty();
+                    String sessionValue = sessionId.split("=")[1];
 
-                String sessionId = setCookieHeaders.stream()
-                        .filter(cookie -> cookie.startsWith("SESSION")) // Spring Session 默认是 SESSION（不是 JSESSIONID）
-                        .map(cookie -> cookie.split(";")[0]) // SESSION=xxx
-                        .findFirst()
-                        .orElseThrow(() -> new RuntimeException("No SESSION found in response"));
+                    // 使用同步块保证线程安全
+                    synchronized (writer) {
+                        writer.printf("%d,%s,%s%n", testUserId, sessionValue, LocalDateTime.now());
+                    }
 
-                String sessionValue = sessionId.split("=")[1];
-
-                writer.printf("%d,%s,%s%n", testUserId, sessionValue, LocalDateTime.now());
-
-                System.out.println("✅ 写入 CSV：" + testUserId + " -> " + sessionValue);
-            }
+                    System.out.println("✅ 写入 CSV：" + testUserId + " -> " + sessionValue);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
         }
     }
 }

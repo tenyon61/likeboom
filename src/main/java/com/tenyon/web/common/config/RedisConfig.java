@@ -34,7 +34,7 @@ public class RedisConfig {
         return template;
     }
 
-//    @Bean
+    @Bean
     public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
         // 让 Spring Session 使用 JSON 方式存储
         return new GenericJackson2JsonRedisSerializer();
