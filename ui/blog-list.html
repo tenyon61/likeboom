@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客列表 - 博客系统</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>博客列表</h1>
+            <div class="header-right">
+                <div id="userInfo">未登录</div>
+                <a href="index.html" class="back-link">返回首页</a>
+            </div>
+        </header>
+        <main>
+            <div class="blog-list" id="blogList">
+                <div class="loading">加载中，请稍后...</div>
+            </div>
+        </main>
+        <footer>
+            <p>© 2023 博客系统 - 版权所有</p>
+        </footer>
+    </div>
+
+    <script>
+        // 检查登录状态
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        if (currentUser) {
+            document.getElementById('userInfo').innerHTML = `
+                <span class="user-welcome">欢迎，${currentUser.username || '用户' + currentUser.id}</span>
+            `;
+        }
+
+        // 获取博客列表
+        fetch('http://localhost:8072/api/blog/getBlogVOList')
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 0 && data.data) {
+                    const blogListElement = document.getElementById('blogList');
+                    blogListElement.innerHTML = '';
+
+                    if (data.data.length === 0) {
+                        blogListElement.innerHTML = '<div class="empty-list">暂无博客内容</div>';
+                        return;
+                    }
+
+                    data.data.forEach(blog => {
+                        const blogCard = document.createElement('div');
+                        blogCard.className = 'blog-card';
+                        blogCard.innerHTML = `
+                            <div class="blog-card-content">
+                                <div class="blog-cover">
+                                    <img src="${blog.coverImg || 'https://via.placeholder.com/300x200/e0e0e0/2c3e50?text=博客封面'}" alt="博客封面" onerror="this.src='https://via.placeholder.com/300x200/e0e0e0/2c3e50?text=无封面'">
+                                </div>
+                                <div class="blog-info-container">
+                                    <h2 class="blog-title">${blog.title || '无标题'}</h2>
+                                    <div class="blog-info">
+                                        <span>作者: ${blog.authorName || '匿名'}</span>
+                                        <span>发布时间: ${formatDate(blog.createTime)}</span>
+                                    </div>
+                                    <p class="blog-content">${blog.content ? (blog.content.length > 150 ? blog.content.substring(0, 150) + '...' : blog.content) : '无内容'}</p>
+                                    <div class="blog-actions">
+                                        <a href="blog-detail.html?id=${blog.id}" class="btn secondary-btn">查看详情</a>
+                                        <button class="thumb-btn ${blog.hasThumb ? 'liked' : ''}" data-id="${blog.id}">
+                                            <i class="bi bi-hand-thumbs-up${blog.hasThumb ? '-fill' : ''}"></i>
+                                            <span class="thumb-count">${blog.thumbNum || 0}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        blogListElement.appendChild(blogCard);
+                    });
+
+                    // 添加点赞事件监听
+                    addThumbListeners();
+                } else {
+                    document.getElementById('blogList').innerHTML =
+                        `<div class="error">获取博客列表失败：${data.msg || '未知错误'}</div>`;
+                }
+            })
+            .catch(error => {
+                document.getElementById('blogList').innerHTML =
+                    `<div class="error">请求出错：${error.message}</div>`;
+            });
+
+        // 格式化日期
+        function formatDate(timestamp) {
+            if (!timestamp) return '未知时间';
+            const date = new Date(timestamp);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // 添加点赞事件监听
+        function addThumbListeners() {
+            document.querySelectorAll('.thumb-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    // 检查是否登录
+                    if (!currentUser) {
+                        alert('请先登录再进行点赞操作');
+                        window.location.href = 'login.html';
+                        return;
+                    }
+
+                    const blogId = this.dataset.id;
+                    const isLiked = this.classList.contains('liked');
+                    const endpoint = isLiked ? 'undo' : 'do';
+
+                    // 构建请求数据
+                    const requestData = {
+                        entityId: blogId,
+                        entityType: 'blog' // 假设后端有这个类型
+                    };
+
+                    // 发送点赞/取消点赞请求
+                    fetch(`http://localhost:8072/api/thumb/${endpoint}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestData)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.code === 0 && data.data) {
+                                // 更新UI
+                                const countElem = this.querySelector('.thumb-count');
+                                const iconElem = this.querySelector('i');
+
+                                if (isLiked) {
+                                    this.classList.remove('liked');
+                                    iconElem.className = 'bi bi-hand-thumbs-up';
+                                    countElem.textContent = parseInt(countElem.textContent) - 1;
+                                } else {
+                                    this.classList.add('liked');
+                                    iconElem.className = 'bi bi-hand-thumbs-up-fill';
+                                    countElem.textContent = parseInt(countElem.textContent) + 1;
+                                }
+                            } else {
+                                alert(`操作失败：${data.msg || '未知错误'}`);
+                            }
+                        })
+                        .catch(error => {
+                            alert(`请求出错：${error.message}`);
+                        });
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

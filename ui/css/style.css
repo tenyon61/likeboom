@@ -1,0 +1,383 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f7fa;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #2076b2;
+}
+
+/* 按钮样式 */
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.primary-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.primary-btn:hover {
+    background-color: #2076b2;
+    color: white;
+}
+
+.secondary-btn {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+}
+
+.secondary-btn:hover {
+    background-color: #bdc3c7;
+}
+
+/* 头部样式 */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.back-link {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #f1f1f1;
+    border-radius: 4px;
+    color: #333;
+}
+
+.back-link:hover {
+    background-color: #e0e0e0;
+}
+
+.user-welcome {
+    font-weight: bold;
+    color: #3498db;
+}
+
+/* 主体内容区域 */
+main {
+    min-height: calc(100vh - 180px);
+}
+
+/* 欢迎卡片 */
+.welcome-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 50px auto;
+    max-width: 600px;
+}
+
+.welcome-card h2 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* 登录表单 */
+.login-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 50px auto;
+    max-width: 500px;
+}
+
+.login-card h2 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.message-box {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.success {
+    color: #27ae60;
+    background-color: #d8f3e5;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.error {
+    color: #e74c3c;
+    background-color: #fae1dd;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+/* 博客列表 */
+.blog-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.blog-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.blog-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 博客卡片内容布局 */
+.blog-card-content {
+    display: flex;
+    gap: 20px;
+}
+
+/* 博客封面样式 */
+.blog-cover {
+    flex: 0 0 200px;
+    height: 160px;
+    overflow: hidden;
+    border-radius: 6px;
+}
+
+.blog-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.blog-cover img:hover {
+    transform: scale(1.05);
+}
+
+.blog-info-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.blog-title {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.blog-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+.blog-content {
+    margin-bottom: 20px;
+    color: #34495e;
+    line-height: 1.8;
+}
+
+.blog-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+/* 点赞按钮 */
+.thumb-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    background-color: transparent;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.thumb-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.thumb-btn.liked {
+    color: #e74c3c;
+    border-color: #e74c3c;
+}
+
+.thumb-btn i {
+    font-size: 16px;
+}
+
+/* 博客详情 */
+.blog-detail-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 博客详情封面 */
+.blog-detail-cover {
+    margin: -30px -30px 20px;
+    max-height: 400px;
+    overflow: hidden;
+    border-radius: 8px 8px 0 0;
+}
+
+.blog-detail-cover img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.blog-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.blog-stats {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.blog-content {
+    line-height: 1.8;
+    color: #34495e;
+    white-space: pre-line;
+}
+
+/* 加载状态 */
+.loading {
+    text-align: center;
+    padding: 30px;
+    color: #7f8c8d;
+}
+
+.empty-list {
+    text-align: center;
+    padding: 30px;
+    color: #7f8c8d;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 页脚 */
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .blog-card-content {
+        flex-direction: column;
+    }
+    
+    .blog-cover {
+        width: 100%;
+        flex: auto;
+        margin-bottom: 15px;
+    }
+    
+    .blog-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .blog-stats {
+        width: 100%;
+        justify-content: flex-end;
+    }
+} 
